@@ -57,6 +57,7 @@ public class NetWorkUtils {
     private static JSONObject makeHttpRequest(URL url) throws IOException {
         JSONObject jsonResponse = null;
         if (url == null) {
+            Log.e(TAG, "makeHttpRequest: it's null");
             return jsonResponse;
         }
 
@@ -78,6 +79,7 @@ public class NetWorkUtils {
 
         } catch (IOException | JSONException e) {
             Log.e(TAG, "Problem getting books info", e);
+            e.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -104,31 +106,52 @@ public class NetWorkUtils {
     }
 
     private static List<ItemBook> getBookList(JSONObject response) {
-
         List<ItemBook> itemBooks = new ArrayList<>();
-        try {
-            JSONArray items = response.getJSONArray("items");
-            for (int i = 0; i < items.length(); i++) {
-                JSONObject currentJson = items.getJSONObject(i);
-                JSONObject volumeInfoJson = currentJson.getJSONObject("volumeInfo");
-                String urlImg = volumeInfoJson.getJSONObject("imageLinks").getString("smallThumbnail");
-                String title = volumeInfoJson.getString("title");
-                String year = volumeInfoJson.getString("publishedDate");
-                int pCount = volumeInfoJson.getInt("pageCount");
-                String urlBook = currentJson.getString("selfLink");
-                StringBuilder stringBuilder = new StringBuilder();
-                for (int j = 0; j < volumeInfoJson.getJSONArray("authors").length(); j++) {
-                    stringBuilder.append(volumeInfoJson.getJSONArray("authors").get(j));
-                    if (j != volumeInfoJson.getJSONArray("authors").length()-1) {
-                        stringBuilder.append(" | ");
-                    }
-                }
+        if (response != null) {
+            try {
+                JSONArray items = response.getJSONArray("items");
+                for (int i = 0; i < items.length(); i++) {
+                    JSONObject currentJson = items.getJSONObject(i);
 
-                ItemBook itemBook = new ItemBook(urlImg, title, stringBuilder.toString(), year, pCount, urlBook);
-                itemBooks.add(itemBook);
+                    String urlImg = "";
+                    String title = "";
+                    String year = "";
+                    int pCount = 0;
+                    String urlBook = "";
+                    StringBuilder stringBuilder = new StringBuilder();
+                    if (currentJson.has("volumeInfo")) {
+                        JSONObject volumeInfoJson = currentJson.getJSONObject("volumeInfo");
+                        if (volumeInfoJson.has("imageLinks")) {
+                            urlImg = volumeInfoJson.getJSONObject("imageLinks").getString("smallThumbnail");
+                        }
+                        if (volumeInfoJson.has("title")) {
+                            title = volumeInfoJson.getString("title");
+                        }
+                        if (volumeInfoJson.has("publishedDate")) {
+                            year = volumeInfoJson.getString("publishedDate");
+                        }
+                        if (volumeInfoJson.has("pageCount")) {
+                            pCount = volumeInfoJson.getInt("pageCount");
+                        }
+                        if (volumeInfoJson.has("selfLink")) {
+                            urlBook = currentJson.getString("selfLink");
+                        }
+                        if (volumeInfoJson.has("authors")) {
+                            for (int j = 0; j < volumeInfoJson.getJSONArray("authors").length(); j++) {
+                                stringBuilder.append(volumeInfoJson.getJSONArray("authors").get(j));
+                                if (j != volumeInfoJson.getJSONArray("authors").length() - 1) {
+                                    stringBuilder.append(" | ");
+                                }
+                            }
+                        }
+                    }
+
+                    ItemBook itemBook = new ItemBook(urlImg, title, stringBuilder.toString(), year, pCount, urlBook);
+                    itemBooks.add(itemBook);
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, "Problem parsing book JSON", e);
             }
-        } catch (JSONException e) {
-            Log.e(TAG, "Problem parsing book JSON", e);
         }
         return itemBooks;
     }

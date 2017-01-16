@@ -13,9 +13,6 @@ public class ItemBook {
     private int pCount;
     private String urlBook;
 
-    public ItemBook() {
-    }
-
     public ItemBook(String imgUrl, String title, String authors, String year, int pCount, String urlBook) {
         this.imgUrl = imgUrl;
         this.title = title;
@@ -41,47 +38,24 @@ public class ItemBook {
         return imgUrl;
     }
 
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getAuthors() {
         return authors;
     }
 
-    public void setAuthors(String authors) {
-        this.authors = authors;
-    }
-
     public String getYear() {
         return year;
-    }
-
-    public void setYear(String year) {
-        this.year = year;
     }
 
     public int getpCount() {
         return pCount;
     }
 
-    public void setpCount(int pCount) {
-        this.pCount = pCount;
-    }
-
     public String getUrlBook() {
         return urlBook;
     }
 
-    public void setUrlBook(String urlBook) {
-        this.urlBook = urlBook;
-    }
 }
